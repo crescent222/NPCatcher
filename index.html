@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NPCatcher · 记录那些差一点被时间带走的相遇</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Fredoka:wght@400;500;600;700&family=Caveat:wght@500;700&family=Noto+Serif+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css?v=27" />
+  <script defer src="./script.js?v=27"></script>
+</head>
+<body>
+  <div class="star-far" aria-hidden="true"></div>
+
+  <!-- =================== Hero 区（Lumora 风格 · Fauvist 油画视频） =================== -->
+  <section class="hero-section">
+    <!-- 视频背景层：2 个 Fauvist 油画视频，每次随机选一个 -->
+    <div class="video-layer" id="video-layer">
+      <video class="hero-video" data-index="0" src="./assets/hero-v4.mp4" autoplay muted loop playsinline preload="auto"></video>
+      <video class="hero-video" data-index="1" src="./assets/hero-v6.mp4" autoplay muted loop playsinline preload="auto"></video>
+    </div>
+
+    <!-- 暖色画上的深色叠层（让白色文字能读 + 与宇宙主题融合） -->
+    <div class="hero-paint-overlay" aria-hidden="true"></div>
+
+    <!-- 顶部导航 -->
+    <nav class="hero-nav">
+      <div class="hero-nav-inner">
+        <a href="#" class="brand">NPCatcher</a>
+      </div>
+    </nav>
+
+    <!-- Hero 内容 -->
+    <div class="hero-content">
+      <div class="hero-badge liquid-glass">
+        <span class="hero-badge-dot"></span>
+        <span>已有 <strong>10,000+</strong> 灵魂记录自己的相遇时刻</span>
+      </div>
+
+      <h1 class="hero-title">
+        记录那些差一点被<br/>
+        <em>时间带走的相遇</em>
+      </h1>
+
+      <p class="hero-sub-en">Preserving the encounters that time almost took away.</p>
+
+      <p class="hero-sub">
+        跳出无序的通知、无限滚动的漩涡与无止尽的需求。学会守护你的在场，<br class="hide-sm"/>
+        让每一次相遇都成为值得收藏的卡牌。
+      </p>
+
+      <button class="hero-cta-btn" id="hero-start">
+        <span>开始记录</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+    </div>
+
+    <!-- 底部 stats -->
+    <div class="hero-stats">
+      <span class="stat" id="stat-souls">0 个灵魂</span>
+      <span class="stat-sep">|</span>
+      <span class="stat" id="stat-meets">0 次相遇</span>
+      <span class="stat-sep">|</span>
+      <span class="stat">永不丢失的细节</span>
+      <span class="stat-sep">|</span>
+      <span class="stat">本地存储 · 隐私优先</span>
+    </div>
+  </section>
+
+  <!-- =================== 主体：NPC 收集器 =================== -->
+  <main class="content-section">
+    <header class="content-header">
+      <p class="content-eyebrow">— Codex of Wandering Souls —</p>
+      <h2 class="content-title">万物皆可收集</h2>
+      <p class="content-sub">为每一个与你擦肩而过的灵魂，留一张永恒的卡牌。</p>
+    </header>
+
+    <div class="toolbar">
+      <button class="btn-primary" id="btn-add">
+        <span class="btn-icon">✦</span> 记录一位 NPC
+      </button>
+      <button class="btn-ghost" id="btn-clear">清空收藏</button>
+      <div class="toolbar-right">
+        <button class="btn-ghost btn-mute" id="btn-mute" title="切换音效">
+          <span class="mute-icon">🔊</span>
+        </button>
+        <div class="user-pill" id="user-pill" title="点击切换用户">
+          <span class="user-pill-dot"></span>
+          <span class="user-pill-name" id="user-pill-name">default</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <button class="btn-ghost btn-data" id="btn-data" title="数据管理：导出/导入/同步">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          数据
+          <span class="backup-status" id="backup-status"></span>
+        </button>
+        <span class="storage-health" id="storage-health" title="点击查看存储详情"></span>
+      </div>
+    </div>
+
+    <div class="gallery" id="gallery">
+      <div class="empty-state" id="empty-state">
+        <div class="empty-frame">
+          <p class="empty-title">— Codex 仍是一片空白 —</p>
+          <p class="empty-desc">点击上方「记录一位 NPC」开始你的第一张卡牌。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- =================== 世界地图 =================== -->
+    <section class="map-section" id="map-section">
+      <header class="map-header">
+        <p class="map-eyebrow">— Atlas of Wandering Souls —</p>
+        <h2 class="map-title">你的相遇，已经点亮这些地方</h2>
+        <p class="map-sub">点一下地图上的星星 ✦ 看看 TA 是谁 · 选个国家钻进去看每个城市 · 拖动可滑动 · 滚轮可缩放</p>
+      </header>
+
+      <!-- 国家选择条 -->
+      <div class="map-countries" id="map-countries">
+        <button type="button" class="country-pill is-active" data-country="__world__">
+          <span class="cp-globe">🌍</span> 全球
+        </button>
+        <!-- 动态生成 -->
+      </div>
+
+      <div class="map-container" id="map-container">
+        <button type="button" class="back-to-world" id="back-to-world" hidden>
+          ← 返回全球
+        </button>
+        <svg class="world-map" id="world-map" viewBox="0 0 950 620" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <radialGradient id="starGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#fff" stop-opacity="0.9"/>
+              <stop offset="40%" stop-color="#ff6fb5" stop-opacity="0.5"/>
+              <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <!-- 把世界地图作为 SVG 内部 image，共享 viewBox 缩放 -->
+          <image class="map-bg" href="./assets/world-map.svg" x="0" y="0" width="950" height="620" />
+          <!-- 标记层（动态生成） -->
+          <g class="markers" id="map-markers"></g>
+        </svg>
+        <div class="map-empty" id="map-empty">
+          <p>还没有任何相遇点亮地图 ✦</p>
+          <p>添加 NPC 时选一个城市，看看会发生什么</p>
+        </div>
+        <div class="map-zoom-hint" id="map-zoom-hint" hidden>
+          <span id="zoom-hint-text">点击星星查看该城市的灵魂</span>
+        </div>
+      </div>
+
+      <div class="map-legend">
+        <span class="legend-dot"></span> 标记处 = 你记录的相遇 · 拖动地图探索更多
+      </div>
+    </section>
+  </main>
+
+  <!-- =================== 添加 NPC 模态框 =================== -->
+  <div class="modal" id="modal" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-window cosmic" role="dialog" aria-modal="true">
+      <button class="modal-close" data-close aria-label="关闭">×</button>
+      <header class="modal-header">
+        <p class="modal-eyebrow">— New Entry —</p>
+        <h2>记录一位新角色</h2>
+      </header>
+
+      <form class="form" id="npc-form">
+        <div class="form-row">
+          <label class="field-label">人物实拍图 *</label>
+          <div class="upload-box" id="upload-box">
+            <input type="file" id="file-input" accept="image/*" hidden />
+            <div class="upload-placeholder" id="upload-placeholder">
+              <div class="upload-icon">⬆</div>
+              <p>点击或拖拽上传照片</p>
+              <p class="upload-hint">JPG / PNG · 用于生成卡通版 + 背面存档</p>
+            </div>
+            <img class="upload-preview" id="upload-preview" alt="预览" hidden />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="cartoon-row">
+            <label class="field-label">正面肖像 · 3D 角色卡牌</label>
+            <button type="button" class="link-btn" id="btn-use-photo-as-cartoon">用实拍图</button>
+          </div>
+
+          <div class="style-3d-block">
+            <div class="style-3d-card">
+              <div class="style-3d-thumb">
+                <img src="./assets/style-reference.jpg" alt="参考图" />
+                <span class="style-3d-badge">✨ 本地生成</span>
+              </div>
+              <div class="style-3d-info">
+                <p class="style-3d-title">🎨 拼贴艺术生成器</p>
+                <p class="style-3d-desc">黑白半色调人像 + 街头拼贴元素 · 1-2 秒出图 · 完全本地</p>
+                <p class="style-3d-status" id="style-3d-status">未上传 · 等待照片</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="style-pills style-pills-mini" id="style-pills" hidden>
+            <!-- 旧版 3 类别 pill 已废弃，单一换一换按钮足够 -->
+          </div>
+
+          <p class="style-hint" id="style-hint">
+            <span class="privacy-tag">🔒 100% 本地</span>
+            5 种拼贴风格（杂志 / 街头 / 撕贴 / 报纸 / Y2K）· 脸部不遮挡 · 每次"换一换"会出不同变体
+          </p>
+          <button type="button" class="retry-ai-btn retry-ai-btn-big" id="btn-retry-ai">🎲 换一种拼贴风格</button>
+
+          <!-- 风格化预览 -->
+          <div class="style-preview" id="style-preview" hidden>
+            <img id="style-preview-img" alt="风格预览" />
+            <div class="style-preview-badge" id="style-preview-badge">3D 角色</div>
+          </div>
+
+          <!-- 高级选项：用 Mavis AI 重新生成（更好的效果，需 30s） -->
+          <details class="ai-advanced">
+            <summary>✨ 想要更好的 AI 版本？用 Mavis 重新生成（30s）</summary>
+            <div class="mavis-flow liquid-glass">
+              <div class="flow-step">
+                <span class="flow-num">1</span>
+                <div class="flow-body">
+                  <p class="flow-title">复制 prompt 消息给 Mavis</p>
+                  <p class="flow-desc">点下面按钮复制完整消息，发给我即可</p>
+                  <button type="button" class="btn-mini" id="btn-copy-photo" disabled>
+                    <span class="btn-icon">📋</span> 复制完整消息
+                  </button>
+                  <span class="flow-hint" id="copy-hint"></span>
+                </div>
+              </div>
+              <div class="flow-step">
+                <span class="flow-num">2</span>
+                <div class="flow-body">
+                  <p class="flow-title">把 Mavis 生成的图粘回这里（会覆盖本地风格化）</p>
+                  <p class="flow-desc">把图 attach 到对话 → 粘 prompt → 我生成 → 复制图粘到这</p>
+                  <div class="upload-box upload-box-sm" id="cartoon-box">
+                    <input type="file" id="cartoon-input" accept="image/*" hidden />
+                    <div class="upload-placeholder" id="cartoon-placeholder">
+                      <div class="upload-icon">✨</div>
+                      <p>粘贴 / 上传 Mavis 生成的图</p>
+                      <p class="upload-hint">留空就用上面的本地 3D 风格化</p>
+                    </div>
+                    <img class="upload-preview" id="cartoon-preview" alt="卡通预览" hidden />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-row">
+            <label class="field-label" for="f-name">名字 *</label>
+            <input id="f-name" type="text" required placeholder="如：深夜便利店的吉他手" />
+          </div>
+          <div class="form-row">
+            <label class="field-label" for="f-quote">一句话介绍</label>
+            <input id="f-quote" type="text" placeholder="用一句金句定义 TA" />
+          </div>
+          <div class="form-row">
+            <label class="field-label" for="f-when">相遇时间</label>
+            <input id="f-when" type="text" placeholder="如：2025.07.14 凌晨" />
+          </div>
+          <div class="form-row">
+            <label class="field-label" for="f-where">相遇城市</label>
+            <input id="f-where" type="text" list="city-list" placeholder="如：上海" />
+            <datalist id="city-list"></datalist>
+          </div>
+          <div class="form-row form-row-wide">
+            <label class="field-label" for="f-trait">性格 / 外貌特色</label>
+            <input id="f-trait" type="text" placeholder="如：银色长发 红色瞳孔 沉默寡言" />
+          </div>
+          <div class="form-row form-row-wide">
+            <label class="field-label" for="f-story">故事记录</label>
+            <textarea id="f-story" rows="5" placeholder="写下你们相遇的瞬间..."></textarea>
+          </div>
+          <div class="form-row form-row-wide">
+            <label class="field-label">卡牌底色</label>
+            <div class="color-picker" id="color-picker" role="radiogroup" aria-label="选择卡牌底色">
+              <button type="button" class="color-swatch is-active" data-color="auto" title="随机 (从照片抽取)">
+                <span class="swatch-auto">∞</span>
+                <span class="swatch-label">随机</span>
+              </button>
+              <button type="button" class="color-swatch" data-color="#d4af37" style="--c:#d4af37" title="金属金">
+                <span class="swatch-label">金</span>
+              </button>
+              <button type="button" class="color-swatch" data-color="#c0c0c0" style="--c:#c0c0c0" title="金属银">
+                <span class="swatch-label">银</span>
+              </button>
+              <button type="button" class="color-swatch" data-color="#9d4edd" style="--c:#9d4edd" title="紫水晶">
+                <span class="swatch-label">紫</span>
+              </button>
+              <button type="button" class="color-swatch" data-color="#4cc9f0" style="--c:#4cc9f0" title="冰蓝">
+                <span class="swatch-label">蓝</span>
+              </button>
+            </div>
+            <p class="color-picker-hint">"随机"会从照片中抽主色；指定颜色会让拼贴用你选的色调。</p>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-ghost" data-close>取消</button>
+          <button type="submit" class="btn-primary" id="btn-generate">
+            <span class="btn-icon">✦</span> 铸造卡牌
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading cosmic" id="loading" hidden>
+    <div class="loading-inner">
+      <div class="loading-orb"></div>
+      <p class="loading-text">正在召唤 TA 的灵魂…</p>
+      <p class="loading-sub">将你的照片转化为卡牌肖像</p>
+    </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" hidden>
+    <div class="lightbox-backdrop" data-lb-close></div>
+    <div class="lightbox-inner cosmic">
+      <button class="lightbox-close" data-lb-close aria-label="关闭">×</button>
+      <img id="lightbox-img" alt="放大" />
+    </div>
+  </div>
+
+  <!-- 卡牌聚焦模式：点击卡牌进入，毛玻璃背景 + 卡片置中放大 -->
+  <div class="card-focus" id="card-focus" hidden>
+    <div class="card-focus-backdrop" data-cf-close></div>
+    <div class="card-focus-stage" id="card-focus-stage">
+      <button class="card-focus-close" data-cf-close aria-label="关闭">×</button>
+      <div class="card-focus-card" id="card-focus-card">
+        <div class="card-inner">
+          <div class="card-face card-front">
+            <div class="card-border">
+              <div class="card-art" id="cf-art">
+                <div class="card-ribbon">— Portrait —</div>
+                <img class="card-portrait-img" alt="肖像" />
+              </div>
+              <div class="card-name" id="cf-name"></div>
+              <div class="card-quote" id="cf-quote"></div>
+              <div class="card-meet">
+                <span class="meet-when" id="cf-when"></span>
+                <span class="meet-divider">·</span>
+                <span class="meet-where" id="cf-where"></span>
+              </div>
+            </div>
+          </div>
+          <div class="card-face card-back">
+            <div class="back-photo" id="cf-photo">
+              <img class="back-photo-img" alt="实拍" />
+            </div>
+            <div class="back-content">
+              <h3 class="back-name" id="cf-back-name"></h3>
+              <div class="back-meta" id="cf-back-meta"></div>
+              <p class="back-trait" id="cf-back-trait"></p>
+              <p class="back-story" id="cf-back-story"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-focus-hint">— 点空白处关闭 —</div>
+    </div>
+  </div>
+
+  <!-- 地图弹窗 -->
+  <div class="map-popup" id="map-popup" hidden>
+    <div class="map-popup-backdrop" data-popup-close></div>
+    <div class="map-popup-panel cosmic">
+      <button class="map-popup-close" data-popup-close aria-label="关闭">×</button>
+      <header class="map-popup-header">
+        <p class="map-popup-eyebrow">— 在这座城市里 —</p>
+        <h3 id="map-popup-city">城市名</h3>
+        <p id="map-popup-count" class="map-popup-count">N 个灵魂</p>
+      </header>
+      <div class="map-popup-list" id="map-popup-list">
+        <!-- NPC 卡片列表由 JS 渲染 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 卡牌模板 -->
+  <template id="card-tpl">
+    <article class="card-wrap">
+      <div class="card">
+        <div class="card-inner">
+          <div class="card-face card-front">
+            <div class="card-border">
+              <div class="card-art">
+                <div class="card-ribbon">— Codex —</div>
+                <img class="card-portrait-img" alt="肖像" />
+              </div>
+              <div class="card-name"></div>
+              <div class="card-quote"></div>
+              <div class="card-meet">
+                <span class="meet-when"></span>
+                <span class="meet-divider">·</span>
+                <span class="meet-where"></span>
+              </div>
+              <div class="card-corner tl">⭐</div>
+              <div class="card-corner tr">💎</div>
+              <div class="card-corner bl">🪩</div>
+              <div class="card-corner br">💿</div>
+            </div>
+          </div>
+          <div class="card-face card-back">
+            <div class="back-photo">
+              <img class="back-photo-img" alt="实拍" />
+            </div>
+            <div class="back-content">
+              <h3 class="back-name"></h3>
+              <div class="back-meta"></div>
+              <p class="back-trait"></p>
+              <p class="back-story"></p>
+            </div>
+            <div class="card-corner tl">⭐</div>
+            <div class="card-corner tr">💎</div>
+            <div class="card-corner bl">🪩</div>
+            <div class="card-corner br">💿</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-actions">
+        <button class="card-btn flip">翻转</button>
+        <button class="card-btn edit">编辑</button>
+        <button class="card-btn delete">删除</button>
+      </div>
+    </article>
+  </template>
+
+  <!-- =================== 用户切换弹窗 =================== -->
+  <div class="user-popup" id="user-popup" hidden>
+    <div class="user-popup-backdrop" data-user-close></div>
+    <div class="user-popup-panel cosmic">
+      <button class="user-popup-close" data-user-close aria-label="关闭">×</button>
+      <header class="user-popup-header">
+        <p class="user-popup-eyebrow">— Account —</p>
+        <h3>切换 / 新建账户</h3>
+        <p class="user-popup-sub">同一台设备上，不同账户的数据互不干扰。数据全部存在你的浏览器本地。</p>
+      </header>
+
+      <div class="user-popup-form">
+        <input type="text" id="user-name-input" placeholder="输入名字（如：小明 / 妈妈 / 工作本）" maxlength="20" />
+        <button class="btn-primary" id="user-create-btn">
+          <span class="btn-icon">✦</span> 创建 / 切换
+        </button>
+      </div>
+
+      <div class="user-popup-list" id="user-popup-list">
+        <p class="user-list-label">— 已知账户 —</p>
+        <!-- 动态生成 -->
+      </div>
+
+      <p class="user-popup-hint">⚠️ 这不是真正的注册系统——账户名仅用于在本地区分数据。请确保你自己能记住每个名字。</p>
+    </div>
+  </div>
+
+  <!-- =================== 数据管理弹窗 =================== -->
+  <!-- 首次访问数据安全说明 -->
+  <div class="onboarding-modal" id="onboarding-modal" hidden>
+    <div class="onboarding-backdrop" data-onboard-close></div>
+    <div class="onboarding-panel cosmic">
+      <button class="onboarding-close" data-onboard-close aria-label="关闭">×</button>
+      <div class="onboarding-icon">💾</div>
+      <h3 class="onboarding-title">先说一下数据存在哪里</h3>
+      <div class="onboarding-body">
+        <p class="onboarding-strong">你的 NPC 全部存<strong>这个浏览器</strong>里，服务器不存任何东西。</p>
+        <p>所以下面这些情况数据会<strong>丢失</strong>，需要你提前备份：</p>
+        <ul class="onboarding-list">
+          <li>🚫 清浏览器缓存 / Cookie / 网站数据</li>
+          <li>🚫 换浏览器（Chrome → Safari）</li>
+          <li>🚫 换电脑 / 重装系统</li>
+          <li>🚫 用隐私/无痕模式打开</li>
+          <li>🚫 部署链接 404 后访问不到</li>
+        </ul>
+        <p class="onboarding-tip">建议：<strong>每隔一段时间</strong>，点右上角「<strong>数据</strong>」→「<strong>导出 JSON</strong>」，把文件存到云盘 / 微信收藏。哪天数据丢了，导入就能还原。</p>
+      </div>
+      <div class="onboarding-actions">
+        <button class="btn-ghost" data-onboard-close>我知道了</button>
+        <button class="btn-primary" id="btn-onboard-export">
+          <span class="btn-icon">📦</span> 现在去导出
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="data-popup" id="data-popup" hidden>
+    <div class="data-popup-backdrop" data-data-close></div>
+    <div class="data-popup-panel cosmic">
+      <button class="data-popup-close" data-data-close aria-label="关闭">×</button>
+      <header class="data-popup-header">
+        <p class="data-popup-eyebrow">— Data —</p>
+        <h3>数据管理</h3>
+        <p class="data-popup-sub" id="data-popup-user-label">当前账户：default</p>
+      </header>
+
+      <!-- 存储健康 -->
+      <section class="data-section">
+        <h4 class="data-section-title">💾 存储健康</h4>
+        <div class="data-stats" id="data-stats">
+          <div class="data-stat">
+            <span class="data-stat-label">NPC 数</span>
+            <span class="data-stat-value" id="stat-npc-count">0</span>
+          </div>
+          <div class="data-stat">
+            <span class="data-stat-label">占用</span>
+            <span class="data-stat-value" id="stat-storage-size">0 KB</span>
+          </div>
+          <div class="data-stat">
+            <span class="data-stat-label">上次保存</span>
+            <span class="data-stat-value" id="stat-last-saved">—</span>
+          </div>
+          <div class="data-stat">
+            <span class="data-stat-label">上次备份</span>
+            <span class="data-stat-value" id="stat-last-backup">从未</span>
+          </div>
+        </div>
+        <p class="data-storage-msg" id="data-storage-msg"></p>
+      </section>
+
+      <!-- 导出 / 导入 -->
+      <section class="data-section">
+        <h4 class="data-section-title">📦 备份与迁移</h4>
+        <p class="data-section-desc">把当前账户的全部数据（照片 + 拼贴 + 元数据）打包成一个 JSON 文件，可保存到本地 / 云盘，或发到另一台设备上用「导入」还原。</p>
+        <div class="data-btn-row">
+          <button class="btn-primary" id="btn-export-json">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            导出 JSON
+          </button>
+          <button class="btn-ghost" id="btn-import-json">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            导入 JSON
+          </button>
+          <input type="file" id="import-file-input" accept=".json,application/json" hidden />
+        </div>
+      </section>
+
+      <!-- 同步码 -->
+      <section class="data-section">
+        <h4 class="data-section-title">🔗 同步码（跨设备快速迁移）</h4>
+        <p class="data-section-desc">把当前账户打包成一段可复制的文本（base64 + LZ 压缩），发到另一台设备的「同步码粘贴」框里即可还原。注意：照片多的时候文本会很长。</p>
+        <div class="data-btn-row">
+          <button class="btn-primary" id="btn-gen-sync-code">生成同步码</button>
+          <button class="btn-ghost" id="btn-show-sync-input">从同步码导入</button>
+        </div>
+        <div class="sync-code-area" id="sync-code-area" hidden>
+          <textarea id="sync-code-text" rows="6" placeholder="同步码会出现在这里（点上方按钮生成 / 粘贴旧的同步码再点导入）"></textarea>
+          <div class="data-btn-row">
+            <button class="btn-ghost" id="btn-copy-sync-code">复制到剪贴板</button>
+            <button class="btn-primary" id="btn-apply-sync-code">导入这段同步码</button>
+          </div>
+        </div>
+        <p class="sync-code-hint" id="sync-code-hint"></p>
+      </section>
+
+      <!-- 危险区 -->
+      <section class="data-section data-section-danger">
+        <h4 class="data-section-title">⚠️ 危险操作</h4>
+        <div class="data-btn-row">
+          <button class="btn-ghost btn-danger" id="btn-clear-current-user">仅清空当前账户</button>
+          <button class="btn-ghost btn-danger" id="btn-wipe-all">清空所有数据</button>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <footer class="site-foot">
+    <p>— <span>✦</span> Made with care · Local-only · 数据仅存于你的浏览器 <span>✦</span> —</p>
+  </footer>
+
+</body>
+</html>
